@@ -2,16 +2,15 @@
 
 echo %~dp0
 
-echo コピー先の対象フォルダは以下となります。
-for /d %%a in (%~dp0\..\*) do (echo "%%a")
+echo copy directory list
+for /d %%a in ("%~dp0\..\*") do (echo "%%a")
 PAUSE
 
-for /d %%a in (%~dp0\..\*) do (call :hoge "%%a")
+for /d %%a in ("%~dp0\..\*") do (call :hoge "%%a")
 goto end
 
 :hoge
-if 
-copy *.xlsx %~1\%C_FILE%
+copy "*.xlsx" "%~1\"
 exit /b
 
 :end
