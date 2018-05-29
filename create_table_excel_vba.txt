@@ -1,0 +1,33 @@
+Sub Create_Table()
+    Dim table_name As String
+    table_name = "一覧(マクロ)"
+    If Worksheets(1).Name <> table_name Then
+        Worksheets.Add Before:=Worksheets(1)
+        ActiveSheet.Name = table_name
+    End If
+    
+    ' シート列を追加
+    For i = 2 To Worksheets.Count
+        Sheets(1).Cells(i, 1) = Sheets(i).Name
+    Next
+    
+    ' 項目列を追加 + 項目数を求める
+    Dim item_cnt As Integer
+    item_cnt = 0
+    For i = 1 To 100
+        If Sheets(2).Cells(i, 1) = "" Then
+            Exit For
+        End If
+         Sheets(1).Cells(1, i + 1) = Sheets(2).Cells(i, 1)
+         item_cnt = item_cnt + 1
+    Next
+    
+    
+    ' シートごとにコピー処理
+    For i = 2 To Worksheets.Count
+        For j = 1 To item_cnt
+            Sheets(1).Cells(i, j + 1) = Sheets(i).Cells(j, 2)
+        Next
+    Next
+    
+End Sub
