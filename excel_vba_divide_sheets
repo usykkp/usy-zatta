@@ -1,0 +1,83 @@
+@if(0)==(0) ECHO OFF
+
+cscript.exe //nologo //E:JScript "%~f0" %*
+
+@pause
+GOTO :EOF
+@end
+
+
+
+/*
+
+	ドロップしたExcelファイルの全シートを，
+	１シートずつ個別のファイルに保存し直すバッチ
+
+*/
+
+
+// 引数取得
+if( WScript.Arguments.length == 0 )
+{
+	WScript.Echo("引数がありません。");
+	WScript.Quit();
+}
+var filename = WScript.Arguments.Unnamed(0);
+var ws = WScript.CreateObject("WScript.Shell");
+var cwd = ws.CurrentDirectory;
+//var filepath = cwd + "\\" + filename;
+var filepath = filename;
+
+
+
+// Excelブックを開く
+var excel = WScript.CreateObject("Excel.Application");
+excel.Visible = true;
+excel.Workbooks.Open( filepath );
+var book = excel.Workbooks( excel.Workbooks.Count ); // ワークブックを取得
+var xlMaximized = -4137;
+excel.ActiveWindow.WindowState = xlMaximized; // 最大化
+
+
+
+
+// 全シートをスキャンして，シート名を調査
+var sheets = book.WorkSheets;
+var e = new Enumerator( sheets );
+var arr_sheets = [];
+for( ; ! e.atEnd() ;  e.moveNext() )
+{
+	// シートを取得
+	var sheet = e.item();
+	
+	// 保持
+	arr_sheets.push( sheet );
+	
+}
+
+
+// 取得済みの全シートについて
+for( var i = 0; i < arr_sheets.length; i ++ ){
+
+	// 新規ワークブックを作成
+	excel.Workbooks.Add();
+	var new_book = excel.Workbooks( excel.Workbooks.Count ); // ワークブックを取得
+
+	// シートを先頭にコピー挿入
+	//arr_sheets[i].Copy( new_book.Worksheets( new_book.Worksheets.Count ) );
+	arr_sheets[i].Copy( new_book.Worksheets( 1 ) );
+	
+	// 不要シートを消す（Sheet1～Sheet3）
+	// new_book.Worksheets( 4 ).Delete();
+	// new_book.Worksheets( 3 ).Delete();
+	new_book.Worksheets( 2 ).Delete();
+
+	// 新規ファイル保存。ファイル名はシート名
+	var new_filepath = cwd + "\\" + arr_sheets[i].Name + ".xlsx";
+	WScript.Echo( "新規ブックのパス：" + new_filepath );
+	new_book.SaveAs( new_filepath );
+	
+	// 閉じる
+	new_book.Close();
+
+}
